@@ -1,0 +1,15 @@
+pandas
+numpy
+scikit-learn
+fastapi
+uvicorn
+requests
+streamlit
+dagshub
+matplotlib
+mlflow
+python-dotenv
+seaborn
+psycopg2-binary 
+sqlalchemy
+-e .
