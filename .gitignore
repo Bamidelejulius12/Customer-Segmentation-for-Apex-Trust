@@ -1,6 +1,8 @@
 # bank_env
 GithubSteps.txt
 cred.txt
-.env
-Dataset
 Bank_Trust_RFM_Analysis_using_unsupervised_learning_notebok.ipynb
+.env
+Dataset/
+artifacts/
+

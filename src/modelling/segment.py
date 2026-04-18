@@ -1,11 +1,10 @@
-from src.modelling.clustering import clustering_engine
+from src.modelling.clusters import clustering_engine
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 
 from utils.cluster_utils import cluster_analyzer, assign_cluster_names, cluster_grouping
-from src.modelling.clustering import clustering_engine
-
+from src.modelling.clusters import clustering_engine
 import logging
 
 logging.basicConfig(
@@ -34,3 +33,4 @@ def main():
     engine.cluster_grouper()
 
 main()
+

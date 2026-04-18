@@ -31,7 +31,7 @@ def data_processor(data: pd.DataFrame):
         logging.info(f"Data successfully preprocessed and scaled...")
         return rfm_processed_data, scaler
     except Exception as e:
-        logging.error(f"error occurred while scaling and processing the dataset")
+        logging.error(f"error occurred while scaling and processing the dataset {e}")
 
 def data_processing():
     data = data_ingestion()
@@ -39,6 +39,7 @@ def data_processing():
     features_engineer = feature_eng
     rfm_data = features_engineer.calculate_rfm_metrics(data)
     rfm_data = features_engineer.calculate_rfm_scores(rfm_data)
-    rfm_data_scaled, _ = data_processor(rfm_data)
+    rfm_data_scaled, scaler = data_processor(rfm_data)
     print(rfm_data)
-    return rfm_data_scaled, rfm_data
+    print(rfm_data_scaled)
+    return rfm_data_scaled, rfm_data, scaler
