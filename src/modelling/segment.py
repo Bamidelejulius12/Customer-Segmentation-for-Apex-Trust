@@ -28,9 +28,9 @@ class segment_engine:
         except Exception as e:
             logging.error(f"error occurred while clustering and segmenting the data {e}")
 
-def main():
-    engine = segment_engine
-    engine.cluster_grouper()
+# def main():
+#     engine = segment_engine
+#     engine.cluster_grouper()
 
-main()
+# main()
 

@@ -1,32 +1,38 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import seaborn
+
+
 class Visualization_plots:
     def __init__(self):
         self.colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8']
+
     def customer_segment_visualization(self, rfm_df: pd.DataFrame):
-
-        # --- Big Pie Chart for Customer Distribution ---
         segment_counts = rfm_df['Cluster_Name'].value_counts()
-        plt.figure(figsize=(12, 8))
+
+        fig, ax = plt.subplots(figsize=(12, 8))
+
         explode = [0.05] * len(segment_counts)
-        plt.pie(segment_counts.values,
-                labels=segment_counts.index,
-                autopct=lambda p: f'{p:.1f}%\n({int(p*sum(segment_counts.values)/100):,})',
-                startangle=90,
-                colors=self.colors[:len(segment_counts)],
-                explode=explode,
-                shadow=True)
-        plt.title('RFM Customer Segmentation Distribution\n', fontsize=16, fontweight='bold')
-        plt.axis('equal')
-        plt.show()
 
+        ax.pie(
+            segment_counts.values,
+            labels=segment_counts.index,
+            autopct=lambda p: f'{p:.1f}%',
+            startangle=90,
+            colors=self.colors[:len(segment_counts)],
+            explode=explode,
+            shadow=True
+        )
 
-    def customer_rfm_segment(cluster_profiles: pd.DataFrame):
-            
-        # --- Bar Chart - Average RFM by Segment ---
-        plt.figure(figsize=(10, 6))
+        ax.set_title('RFM Customer Segmentation Distribution', fontsize=16, fontweight='bold')
+        ax.axis('equal')
+
+        return fig
+
+    def customer_rfm_segment(self, cluster_profiles: pd.DataFrame):
+
+        fig, ax = plt.subplots(figsize=(12, 8))
+
         rfm_metrics = ['Avg_Recency', 'Avg_Frequency', 'Avg_Monetary']
         x_pos = np.arange(len(cluster_profiles))
         width = 0.25
@@ -34,29 +40,38 @@ class Visualization_plots:
         for i, metric in enumerate(rfm_metrics):
             values = cluster_profiles[metric].values
             if metric == 'Avg_Monetary':
-                values = values / 1000  # Thousands
-            plt.bar(x_pos + i*width, values, width, label=metric.replace('Avg_', ''), alpha=0.8)
+                values = values / 1000
 
-        plt.xlabel('Customer Segments')
-        plt.ylabel('Values (Monetary in Thousands)')
-        plt.title('Average RFM Values by Segment')
-        plt.xticks(x_pos + width, cluster_profiles.index, rotation=45)
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.tight_layout()
-        plt.show()
+            ax.bar(x_pos + i * width, values, width, label=metric.replace('Avg_', ''))
+
+        ax.set_xlabel('Customer Segments')
+        ax.set_ylabel('Values (Monetary in Thousands)')
+        ax.set_title('Average RFM Values by Segment')
+        ax.set_xticks(x_pos + width)
+        ax.set_xticklabels(cluster_profiles.index, rotation=45)
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+        return fig
 
     def customer_segment_comparison(self, cluster_profiles: pd.DataFrame):
-            
-        # --- Horizontal Bar Chart - Segment Sizes ---
-        plt.figure(figsize=(10, 6))
-        segment_sizes = cluster_profiles.sort_values('Customer_Count')['Customer_Count']
-        plt.barh(range(len(segment_sizes)), segment_sizes.values, color=self.colors[:len(segment_sizes)])
-        plt.yticks(range(len(segment_sizes)), segment_sizes.index)
-        plt.xlabel('Number of Customers')
-        plt.title('Segment Size Comparison')
-        for i, v in enumerate(segment_sizes.values):
-            plt.text(v + 100, i, f'{v:,}', va='center', fontweight='bold')
-        plt.tight_layout()
-        plt.show()
 
+        fig, ax = plt.subplots(figsize=(12, 8))
+
+        segment_sizes = cluster_profiles.sort_values('Customer_Count')['Customer_Count']
+
+        ax.barh(
+            range(len(segment_sizes)),
+            segment_sizes.values,
+            color=self.colors[:len(segment_sizes)]
+        )
+
+        ax.set_yticks(range(len(segment_sizes)))
+        ax.set_yticklabels(segment_sizes.index)
+        ax.set_xlabel('Number of Customers')
+        ax.set_title('Segment Size Comparison')
+
+        for i, v in enumerate(segment_sizes.values):
+            ax.text(v + 100, i, f'{v:,}', va='center', fontweight='bold')
+
+        return fig
