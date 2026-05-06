@@ -7,7 +7,7 @@ from sklearn.metrics import silhouette_score
 import mlflow
 from src.data.data_processing import data_processing
 from utils.mlflow_config import setup_mlflow
-from utils.model_loader import load_model_and_params
+from utils.model_loader import load_model_and_params, is_new_model_better
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -67,22 +67,28 @@ class clustering_engine:
         try:
             self.mlflow_setup
 
-            with mlflow.start_run():
+            optimal_k, best_silhouette = self.find_optimal_clusters()
 
-                optimal_k, best_silhouette = self.find_optimal_clusters()
+            is_better, previous_best = is_new_model_better(
+                best_silhouette,
+                experiment_name="customer_segmentation"
+            )
 
-                # Log parameters and metrics to MLflow
-                mlflow.log_param("optimal_k", optimal_k)
-                mlflow.log_metric("silhouette_score", best_silhouette)
+            if is_better:
+                logging.info(f"New model better ({best_silhouette} > {previous_best})")
 
-                # Log the KMeans model (already stored in self.model)
-                mlflow.sklearn.log_model(
-                    self.model,
-                    artifact_path="model",
-                    registered_model_name="Apex_Trust_model"
-                )
+                with mlflow.start_run():
+                    mlflow.log_param("optimal_k", optimal_k)
+                    mlflow.log_metric("silhouette_score", best_silhouette)
 
-                logging.info("Model logged and registered successfully to MLflow")
+                    mlflow.sklearn.log_model(
+                        self.model,
+                        artifact_path="model",
+                        registered_model_name="Apex_Trust_model"
+                    )
+
+            else:
+                logging.info(f"Skipping logging ({best_silhouette} <= {previous_best})")
 
         except Exception as e:
             logging.error(f"Error training model: {e}")
@@ -116,8 +122,3 @@ class clustering_engine:
 
 
 
-
-# if __name__ == "__main__":
-#     cluster_engine = clustering_engine()
-#     #cluster_engine.train_and_log_model()
-#     clustered_rfm_df = cluster_engine.apply_clustering()

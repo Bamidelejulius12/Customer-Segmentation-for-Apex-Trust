@@ -11,5 +11,7 @@ mlflow
 python-dotenv
 seaborn
 psycopg2-binary 
+pymongo
 sqlalchemy
+plotly
 -e .

@@ -1,7 +1,12 @@
 import mlflow
 from mlflow.tracking import MlflowClient
 from utils.mlflow_config import setup_mlflow
+import logging
 
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    level= logging.DEBUG
+)
 
 def load_model_and_params():
     setup_mlflow()
@@ -41,5 +46,33 @@ def load_model_and_params():
     return model, optimal_k
 
 
-if __name__ == "__main__":
-    load_model_and_params()
+def is_new_model_better(new_score, experiment_name="Default"):
+    try:
+       
+        client = MlflowClient()
+        experiment = client.get_experiment_by_name(experiment_name)
+
+        if experiment is None:
+            # No experiment yet → treat as first run
+            return True, None
+
+        runs = client.search_runs(
+            experiment_ids=[experiment.experiment_id],
+            order_by=["metrics.silhouette_score DESC"],
+            max_results=1
+        )
+
+        if not runs:
+            return True, None
+
+        previous_best = runs[0].data.metrics.get("silhouette_score")
+
+        if previous_best is None:
+            return True, None
+
+        return new_score > previous_best, previous_best
+
+    except Exception as e:
+        # Fail safe: allow logging instead of breaking pipeline
+        logging.error(f"error occurred while loading the previous {e} ")
+        return True, None
