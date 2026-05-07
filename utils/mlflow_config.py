@@ -17,7 +17,7 @@ load_dotenv(override=True)
 
 def setup_mlflow():
 
-    dagshub_token = os.getenv("MFLOW_TOKEN")
+    dagshub_token = os.getenv("MLFLOW_TOKEN")
     if not dagshub_token:
         raise EnvironmentError("Shop_env_DAGSHUB_TOKEN is not set")
 
